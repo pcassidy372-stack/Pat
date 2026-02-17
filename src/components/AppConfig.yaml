@@ -1,0 +1,60 @@
+# =============================================================================
+# AppConfig.yaml
+# PowerApps App-level configuration — paste into App.OnStart and App.Formulas
+# =============================================================================
+
+App:
+  Properties:
+    OnStart: |
+      =// ─── Global variables ───────────────────────────────────────────
+       Set(varCurrentUser, User());
+
+       // App theme colors
+       Set(varColorPrimary,    RGBA(0, 51, 102, 1));
+       Set(varColorAccent,     RGBA(0, 123, 255, 1));
+       Set(varColorSuccess,    RGBA(0, 120, 60, 1));
+       Set(varColorWarning,    RGBA(230, 150, 0, 1));
+       Set(varColorDanger,     RGBA(200, 35, 35, 1));
+       Set(varColorBackground, RGBA(245, 245, 245, 1));
+       Set(varColorCardBg,     Color.White);
+       Set(varColorTextPrimary,   RGBA(33, 37, 41, 1));
+       Set(varColorTextSecondary, RGBA(120, 120, 120, 1));
+
+       // Admin role check — replace with your security group or role
+       Set(varIsAdmin,
+         User().Email in ["admin1@contoso.com", "admin2@contoso.com"]
+         || "mainframe-team" in Lower(
+              Office365Groups.ListGroupMemberships(User().Id)
+            )
+       );
+
+       // Load initial data
+       ClearCollect(
+         colRequests,
+         SortByColumns(
+           'Mainframe Intake Requests',
+           "Created",
+           SortOrder.Descending
+         )
+       );
+
+       // Initialize filter collection
+       ClearCollect(colFiltered, colRequests);
+
+    StartScreen: =DashboardScreen
+
+  # ─── Data Sources ──────────────────────────────────────────────────────
+  # Connect these in PowerApps Studio > Data > Add data:
+  #
+  #   1. SharePoint list: "Mainframe Intake Requests"
+  #      - Site URL:  https://<tenant>.sharepoint.com/sites/MainframeOps
+  #      - List name: Mainframe Intake Requests
+  #
+  #   2. Office365Users connector  (for user lookups / assignment)
+  #   3. Office365Outlook connector (for email notifications)
+  #
+  # ─── Connector Permissions Needed ──────────────────────────────────────
+  #   - SharePoint: Read/Write items in the list
+  #   - Office 365 Users: User.Read.All (search users for assignment)
+  #   - Office 365 Outlook: Mail.Send (optional, for notifications)
+  #   - Approvals connector: (for Power Automate approval flow)

@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MainframeIntakeRequest",
+  "description": "Schema for mainframe intake request records stored in SharePoint or Dataverse",
+  "type": "object",
+  "required": [
+    "Title",
+    "RequestorName",
+    "RequestorEmail",
+    "Department",
+    "RequestType",
+    "Priority",
+    "MainframeEnvironment",
+    "Description",
+    "Status"
+  ],
+  "properties": {
+    "ID": {
+      "type": "integer",
+      "description": "Auto-generated unique identifier"
+    },
+    "Title": {
+      "type": "string",
+      "maxLength": 255,
+      "description": "Short title summarizing the request"
+    },
+    "RequestorName": {
+      "type": "string",
+      "maxLength": 255,
+      "description": "Full name of the person submitting the request"
+    },
+    "RequestorEmail": {
+      "type": "string",
+      "format": "email",
+      "description": "Email address of the requestor"
+    },
+    "Department": {
+      "type": "string",
+      "enum": [
+        "Finance",
+        "Operations",
+        "IT Infrastructure",
+        "Application Development",
+        "Risk & Compliance",
+        "HR",
+        "Customer Service",
+        "Other"
+      ],
+      "description": "Business department originating the request"
+    },
+    "RequestType": {
+      "type": "string",
+      "enum": [
+        "New Job Scheduling",
+        "Job Modification",
+        "Access Request",
+        "Capacity Change",
+        "Incident / Break-Fix",
+        "Decommission",
+        "Data Migration",
+        "Performance Tuning",
+        "Security Review",
+        "Other"
+      ],
+      "description": "Category of mainframe work being requested"
+    },
+    "Priority": {
+      "type": "string",
+      "enum": ["Critical", "High", "Medium", "Low"],
+      "description": "Urgency level of the request"
+    },
+    "MainframeEnvironment": {
+      "type": "string",
+      "enum": ["Production", "Pre-Production", "QA", "Development", "Disaster Recovery"],
+      "description": "Target mainframe environment (LPAR / region)"
+    },
+    "SystemsAffected": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Comma-separated list of mainframe subsystems affected (e.g. CICS, DB2, IMS, MQ, JES2)"
+    },
+    "Description": {
+      "type": "string",
+      "maxLength": 4000,
+      "description": "Detailed description of the work requested"
+    },
+    "BusinessJustification": {
+      "type": "string",
+      "maxLength": 2000,
+      "description": "Why this work is needed and the business impact"
+    },
+    "RequestedCompletionDate": {
+      "type": "string",
+      "format": "date",
+      "description": "Target date for completion (ISO 8601)"
+    },
+    "Status": {
+      "type": "string",
+      "enum": [
+        "Draft",
+        "Submitted",
+        "Under Review",
+        "Approved",
+        "In Progress",
+        "On Hold",
+        "Completed",
+        "Rejected",
+        "Cancelled"
+      ],
+      "default": "Draft",
+      "description": "Current lifecycle status of the request"
+    },
+    "AssignedTo": {
+      "type": "string",
+      "description": "Mainframe team member assigned to fulfill the request"
+    },
+    "ApproverName": {
+      "type": "string",
+      "description": "Manager or lead who approved the request"
+    },
+    "ApprovalDate": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the request was approved"
+    },
+    "CompletionDate": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the request was marked complete"
+    },
+    "Notes": {
+      "type": "string",
+      "maxLength": 4000,
+      "description": "Internal notes and comments from the mainframe team"
+    },
+    "Attachments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "FileName": { "type": "string" },
+          "Url": { "type": "string", "format": "uri" }
+        }
+      },
+      "description": "Supporting documents (JCL, SYSPRINT, screenshots, etc.)"
+    },
+    "Created": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Auto-populated creation timestamp"
+    },
+    "Modified": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Auto-populated last-modified timestamp"
+    }
+  }
+}

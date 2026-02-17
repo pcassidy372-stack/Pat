@@ -1,0 +1,586 @@
+# =============================================================================
+# RequestDetailScreen.yaml
+# PowerApps Canvas App Screen — View / Manage a Single Mainframe Intake Request
+# =============================================================================
+
+Screen: RequestDetailScreen
+  Properties:
+    Fill: =RGBA(245, 245, 245, 1)
+    OnVisible: |
+      =Set(varDetail, LookUp('Mainframe Intake Requests', ID = varSelectedRequest.ID));
+       Set(varIsAdmin,
+         User().Email in ["admin1@contoso.com", "admin2@contoso.com"]
+         || "Mainframe Team" in User().Email
+       )
+
+  Children:
+
+    # ── Header ──────────────────────────────────────────────────────────
+    - HeaderContainer:
+        Control: GroupContainer
+        Properties:
+          X: 0
+          Y: 0
+          Width: =Parent.Width
+          Height: 70
+          Fill: =RGBA(0, 51, 102, 1)
+        Children:
+          - lblDetailTitle:
+              Control: Label
+              Properties:
+                Text: ="Request #" & Text(varDetail.ID) & " — " & varDetail.Title
+                Color: =Color.White
+                FontSize: 20
+                FontWeight: =FontWeight.Bold
+                X: 20
+                Y: 15
+                Width: =Parent.Width - 220
+                Height: 40
+
+          - btnBackDash:
+              Control: Button
+              Properties:
+                Text: "← Dashboard"
+                X: =Parent.Width - 180
+                Y: 15
+                Width: 160
+                Height: 40
+                Fill: =RGBA(255, 255, 255, 0.15)
+                Color: =Color.White
+                BorderColor: =Color.White
+                BorderThickness: 1
+                RadiusTopLeft: 4
+                RadiusTopRight: 4
+                RadiusBottomLeft: 4
+                RadiusBottomRight: 4
+                OnSelect: =Navigate(DashboardScreen, ScreenTransition.Fade)
+
+    # ── Two-Column Detail Layout ────────────────────────────────────────
+    - DetailBody:
+        Control: GroupContainer
+        Properties:
+          X: 0
+          Y: 70
+          Width: =Parent.Width
+          Height: =Parent.Height - 70
+          LayoutMode: Horizontal
+          LayoutGap: 20
+          PaddingTop: 20
+          PaddingLeft: 20
+          PaddingRight: 20
+
+        Children:
+
+          # ── Left Column: Request Information ──────────────────────────
+          - LeftColumn:
+              Control: GroupContainer
+              Properties:
+                Width: =(Parent.Width - 60) * 0.65
+                Height: =Parent.Height - 40
+                Fill: =Color.White
+                RadiusTopLeft: 8
+                RadiusTopRight: 8
+                RadiusBottomLeft: 8
+                RadiusBottomRight: 8
+                DropShadow: =DropShadow.Light
+
+              Children:
+                - lblInfoHeader:
+                    Control: Label
+                    Properties:
+                      Text: "Request Information"
+                      FontSize: 16
+                      FontWeight: =FontWeight.Semibold
+                      Color: =RGBA(0, 51, 102, 1)
+                      X: 25
+                      Y: 15
+                      Width: 400
+                      Height: 30
+
+                # Status & Priority Row
+                - btnDetailStatus:
+                    Control: Button
+                    Properties:
+                      Text: =varDetail.Status
+                      X: 25
+                      Y: 55
+                      Width: 120
+                      Height: 30
+                      FontSize: 12
+                      Color: =Color.White
+                      RadiusTopLeft: 15
+                      RadiusTopRight: 15
+                      RadiusBottomLeft: 15
+                      RadiusBottomRight: 15
+                      Fill: |
+                        =Switch(varDetail.Status,
+                          "Draft",          RGBA(108, 117, 125, 1),
+                          "Submitted",      RGBA(0, 123, 255, 1),
+                          "Under Review",   RGBA(230, 150, 0, 1),
+                          "Approved",       RGBA(0, 120, 60, 1),
+                          "In Progress",    RGBA(0, 150, 200, 1),
+                          "On Hold",        RGBA(180, 100, 20, 1),
+                          "Completed",      RGBA(40, 167, 69, 1),
+                          "Rejected",       RGBA(200, 35, 35, 1),
+                          "Cancelled",      RGBA(108, 117, 125, 1)
+                        )
+                      DisplayMode: =DisplayMode.View
+
+                - btnDetailPriority:
+                    Control: Button
+                    Properties:
+                      Text: =varDetail.Priority
+                      X: 155
+                      Y: 55
+                      Width: 90
+                      Height: 30
+                      FontSize: 12
+                      Color: =Color.White
+                      RadiusTopLeft: 15
+                      RadiusTopRight: 15
+                      RadiusBottomLeft: 15
+                      RadiusBottomRight: 15
+                      Fill: |
+                        =Switch(varDetail.Priority,
+                          "Critical", RGBA(200, 35, 35, 1),
+                          "High",     RGBA(230, 120, 0, 1),
+                          "Medium",   RGBA(0, 120, 180, 1),
+                          "Low",      RGBA(108, 117, 125, 1)
+                        )
+                      DisplayMode: =DisplayMode.View
+
+                # Detail fields
+                - lblFieldRequestor:
+                    Control: Label
+                    Properties:
+                      Text: "Requestor"
+                      FontSize: 11
+                      Color: =RGBA(120, 120, 120, 1)
+                      X: 25
+                      Y: 100
+                      Width: 200
+                      Height: 20
+                - lblValRequestor:
+                    Control: Label
+                    Properties:
+                      Text: =varDetail.RequestorName & " (" & varDetail.RequestorEmail & ")"
+                      FontSize: 13
+                      X: 25
+                      Y: 118
+                      Width: 450
+                      Height: 25
+
+                - lblFieldDept:
+                    Control: Label
+                    Properties:
+                      Text: "Department"
+                      FontSize: 11
+                      Color: =RGBA(120, 120, 120, 1)
+                      X: 25
+                      Y: 150
+                      Width: 200
+                      Height: 20
+                - lblValDept:
+                    Control: Label
+                    Properties:
+                      Text: =varDetail.Department
+                      FontSize: 13
+                      X: 25
+                      Y: 168
+                      Width: 250
+                      Height: 25
+
+                - lblFieldType:
+                    Control: Label
+                    Properties:
+                      Text: "Request Type"
+                      FontSize: 11
+                      Color: =RGBA(120, 120, 120, 1)
+                      X: 280
+                      Y: 150
+                      Width: 200
+                      Height: 20
+                - lblValType:
+                    Control: Label
+                    Properties:
+                      Text: =varDetail.RequestType
+                      FontSize: 13
+                      X: 280
+                      Y: 168
+                      Width: 250
+                      Height: 25
+
+                - lblFieldEnv:
+                    Control: Label
+                    Properties:
+                      Text: "Environment"
+                      FontSize: 11
+                      Color: =RGBA(120, 120, 120, 1)
+                      X: 25
+                      Y: 205
+                      Width: 200
+                      Height: 20
+                - lblValEnv:
+                    Control: Label
+                    Properties:
+                      Text: =varDetail.MainframeEnvironment
+                      FontSize: 13
+                      X: 25
+                      Y: 223
+                      Width: 250
+                      Height: 25
+
+                - lblFieldSystems:
+                    Control: Label
+                    Properties:
+                      Text: "Subsystems Affected"
+                      FontSize: 11
+                      Color: =RGBA(120, 120, 120, 1)
+                      X: 280
+                      Y: 205
+                      Width: 250
+                      Height: 20
+                - lblValSystems:
+                    Control: Label
+                    Properties:
+                      Text: =varDetail.SystemsAffected
+                      FontSize: 13
+                      X: 280
+                      Y: 223
+                      Width: 250
+                      Height: 25
+
+                - Separator2:
+                    Control: Rectangle
+                    Properties:
+                      X: 25
+                      Y: 260
+                      Width: =Parent.Width - 50
+                      Height: 1
+                      Fill: =RGBA(220, 220, 220, 1)
+
+                - lblFieldDesc:
+                    Control: Label
+                    Properties:
+                      Text: "Description"
+                      FontSize: 11
+                      Color: =RGBA(120, 120, 120, 1)
+                      X: 25
+                      Y: 275
+                      Width: 300
+                      Height: 20
+                - lblValDesc:
+                    Control: Label
+                    Properties:
+                      Text: =varDetail.Description
+                      FontSize: 13
+                      X: 25
+                      Y: 295
+                      Width: =Parent.Width - 50
+                      Height: 120
+                      AutoHeight: true
+
+                - lblFieldJustify:
+                    Control: Label
+                    Properties:
+                      Text: "Business Justification"
+                      FontSize: 11
+                      Color: =RGBA(120, 120, 120, 1)
+                      X: 25
+                      Y: 430
+                      Width: 300
+                      Height: 20
+                - lblValJustify:
+                    Control: Label
+                    Properties:
+                      Text: =varDetail.BusinessJustification
+                      FontSize: 13
+                      X: 25
+                      Y: 450
+                      Width: =Parent.Width - 50
+                      Height: 80
+                      AutoHeight: true
+
+                - lblFieldTargetDate:
+                    Control: Label
+                    Properties:
+                      Text: "Requested Completion"
+                      FontSize: 11
+                      Color: =RGBA(120, 120, 120, 1)
+                      X: 25
+                      Y: 545
+                      Width: 200
+                      Height: 20
+                - lblValTargetDate:
+                    Control: Label
+                    Properties:
+                      Text: =Text(varDetail.RequestedCompletionDate, "mmmm dd, yyyy")
+                      FontSize: 13
+                      X: 25
+                      Y: 563
+                      Width: 250
+                      Height: 25
+
+                - lblFieldCreated:
+                    Control: Label
+                    Properties:
+                      Text: "Submitted On"
+                      FontSize: 11
+                      Color: =RGBA(120, 120, 120, 1)
+                      X: 280
+                      Y: 545
+                      Width: 200
+                      Height: 20
+                - lblValCreated:
+                    Control: Label
+                    Properties:
+                      Text: =Text(varDetail.Created, "mmmm dd, yyyy hh:mm AM/PM")
+                      FontSize: 13
+                      X: 280
+                      Y: 563
+                      Width: 300
+                      Height: 25
+
+          # ── Right Column: Actions & Admin Panel ───────────────────────
+          - RightColumn:
+              Control: GroupContainer
+              Properties:
+                Width: =(Parent.Width - 60) * 0.35
+                Height: =Parent.Height - 40
+                Fill: =Color.White
+                RadiusTopLeft: 8
+                RadiusTopRight: 8
+                RadiusBottomLeft: 8
+                RadiusBottomRight: 8
+                DropShadow: =DropShadow.Light
+
+              Children:
+                - lblActionsHeader:
+                    Control: Label
+                    Properties:
+                      Text: "Actions"
+                      FontSize: 16
+                      FontWeight: =FontWeight.Semibold
+                      Color: =RGBA(0, 51, 102, 1)
+                      X: 20
+                      Y: 15
+                      Width: 300
+                      Height: 30
+
+                - btnEditRequest:
+                    Control: Button
+                    Properties:
+                      Text: "Edit Request"
+                      X: 20
+                      Y: 55
+                      Width: =Parent.Width - 40
+                      Height: 40
+                      Fill: =RGBA(0, 123, 255, 1)
+                      Color: =Color.White
+                      RadiusTopLeft: 4
+                      RadiusTopRight: 4
+                      RadiusBottomLeft: 4
+                      RadiusBottomRight: 4
+                      Visible: |
+                        =varDetail.Status = "Draft" ||
+                         varDetail.RequestorEmail = User().Email
+                      OnSelect: |
+                        =Set(varSelectedRequest, varDetail);
+                         Navigate(IntakeFormScreen, ScreenTransition.Fade)
+
+                # ── Admin-Only Controls ─────────────────────────────────
+                - lblAdminSection:
+                    Control: Label
+                    Properties:
+                      Text: "Mainframe Team Actions"
+                      FontSize: 14
+                      FontWeight: =FontWeight.Semibold
+                      Color: =RGBA(0, 51, 102, 1)
+                      X: 20
+                      Y: 115
+                      Width: 300
+                      Height: 25
+                      Visible: =varIsAdmin
+
+                - SeparatorAdmin:
+                    Control: Rectangle
+                    Properties:
+                      X: 20
+                      Y: 140
+                      Width: =Parent.Width - 40
+                      Height: 1
+                      Fill: =RGBA(220, 220, 220, 1)
+                      Visible: =varIsAdmin
+
+                - lblAssignTo:
+                    Control: Label
+                    Properties:
+                      Text: "Assign To"
+                      FontSize: 11
+                      X: 20
+                      Y: 150
+                      Width: 200
+                      Height: 20
+                      Visible: =varIsAdmin
+
+                - ddAssignTo:
+                    Control: DropDown
+                    Properties:
+                      Items: |
+                        =Office365Users.SearchUser({searchTerm: "", top: 50})
+                      X: 20
+                      Y: 172
+                      Width: =Parent.Width - 40
+                      Height: 40
+                      Visible: =varIsAdmin
+
+                - lblUpdateStatus:
+                    Control: Label
+                    Properties:
+                      Text: "Update Status"
+                      FontSize: 11
+                      X: 20
+                      Y: 225
+                      Width: 200
+                      Height: 20
+                      Visible: =varIsAdmin
+
+                - ddUpdateStatus:
+                    Control: DropDown
+                    Properties:
+                      Items: |
+                        =["Under Review", "Approved", "In Progress",
+                          "On Hold", "Completed", "Rejected"]
+                      X: 20
+                      Y: 247
+                      Width: =Parent.Width - 40
+                      Height: 40
+                      Visible: =varIsAdmin
+
+                - lblAdminNotes:
+                    Control: Label
+                    Properties:
+                      Text: "Internal Notes"
+                      FontSize: 11
+                      X: 20
+                      Y: 300
+                      Width: 200
+                      Height: 20
+                      Visible: =varIsAdmin
+
+                - txtAdminNotes:
+                    Control: TextInput
+                    Properties:
+                      Default: =varDetail.Notes
+                      Mode: =TextMode.MultiLine
+                      X: 20
+                      Y: 322
+                      Width: =Parent.Width - 40
+                      Height: 100
+                      Visible: =varIsAdmin
+
+                - btnSaveAdmin:
+                    Control: Button
+                    Properties:
+                      Text: "Save Changes"
+                      X: 20
+                      Y: 435
+                      Width: =Parent.Width - 40
+                      Height: 40
+                      Fill: =RGBA(0, 120, 60, 1)
+                      Color: =Color.White
+                      RadiusTopLeft: 4
+                      RadiusTopRight: 4
+                      RadiusBottomLeft: 4
+                      RadiusBottomRight: 4
+                      Visible: =varIsAdmin
+                      OnSelect: |
+                        =Patch(
+                          'Mainframe Intake Requests',
+                          varDetail,
+                          {
+                            AssignedTo:   ddAssignTo.Selected.DisplayName,
+                            Status:       ddUpdateStatus.Selected.Value,
+                            Notes:        txtAdminNotes.Text,
+                            ApproverName: If(
+                              ddUpdateStatus.Selected.Value = "Approved",
+                              User().FullName,
+                              varDetail.ApproverName
+                            ),
+                            ApprovalDate: If(
+                              ddUpdateStatus.Selected.Value = "Approved",
+                              Now(),
+                              varDetail.ApprovalDate
+                            ),
+                            CompletionDate: If(
+                              ddUpdateStatus.Selected.Value = "Completed",
+                              Now(),
+                              varDetail.CompletionDate
+                            )
+                          }
+                        );
+                        Notify("Request updated.", NotificationType.Success);
+                        Set(varDetail, LookUp('Mainframe Intake Requests', ID = varDetail.ID))
+
+                # ── Audit Trail ─────────────────────────────────────────
+                - lblAuditHeader:
+                    Control: Label
+                    Properties:
+                      Text: "Audit Trail"
+                      FontSize: 14
+                      FontWeight: =FontWeight.Semibold
+                      Color: =RGBA(0, 51, 102, 1)
+                      X: 20
+                      Y: 495
+                      Width: 300
+                      Height: 25
+
+                - lblAuditApprover:
+                    Control: Label
+                    Properties:
+                      Text: |
+                        =If(
+                          !IsBlank(varDetail.ApproverName),
+                          "Approved by " & varDetail.ApproverName &
+                          " on " & Text(varDetail.ApprovalDate, "mm/dd/yyyy"),
+                          "Not yet approved"
+                        )
+                      FontSize: 11
+                      Color: =RGBA(100, 100, 100, 1)
+                      X: 20
+                      Y: 522
+                      Width: =Parent.Width - 40
+                      Height: 20
+
+                - lblAuditAssigned:
+                    Control: Label
+                    Properties:
+                      Text: |
+                        =If(
+                          !IsBlank(varDetail.AssignedTo),
+                          "Assigned to: " & varDetail.AssignedTo,
+                          "Unassigned"
+                        )
+                      FontSize: 11
+                      Color: =RGBA(100, 100, 100, 1)
+                      X: 20
+                      Y: 544
+                      Width: =Parent.Width - 40
+                      Height: 20
+
+                - lblAuditCompleted:
+                    Control: Label
+                    Properties:
+                      Text: |
+                        =If(
+                          !IsBlank(varDetail.CompletionDate),
+                          "Completed on " & Text(varDetail.CompletionDate, "mm/dd/yyyy"),
+                          ""
+                        )
+                      FontSize: 11
+                      Color: =RGBA(0, 120, 60, 1)
+                      X: 20
+                      Y: 566
+                      Width: =Parent.Width - 40
+                      Height: 20
+                      Visible: =!IsBlank(varDetail.CompletionDate)

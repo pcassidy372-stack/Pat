@@ -1,0 +1,108 @@
+{
+  "_comment": "Power Automate Cloud Flow — Mainframe Intake Approval Workflow. Import via Power Automate > My flows > Import > Upload.",
+  "flowName": "Mainframe Intake - Approval Flow",
+  "description": "Triggers when a new intake request is submitted, routes it for approval, and updates status in SharePoint.",
+  "trigger": {
+    "type": "SharePoint - When an item is created or modified",
+    "parameters": {
+      "siteAddress": "https://<tenant>.sharepoint.com/sites/MainframeOps",
+      "listName": "Mainframe Intake Requests"
+    },
+    "triggerCondition": "@equals(triggerOutputs()?['body/Status/Value'], 'Submitted')"
+  },
+  "actions": [
+    {
+      "order": 1,
+      "name": "Initialize_ApproverEmail",
+      "type": "InitializeVariable",
+      "inputs": {
+        "variableName": "varApproverEmail",
+        "variableType": "String",
+        "value": "@{if(equals(triggerOutputs()?['body/Priority/Value'], 'Critical'), 'mainframe-leads@contoso.com', 'mainframe-team@contoso.com')}"
+      }
+    },
+    {
+      "order": 2,
+      "name": "Start_Approval",
+      "type": "Approvals - Start and wait for an approval",
+      "inputs": {
+        "approvalType": "Approve/Reject - First to respond",
+        "title": "Mainframe Intake Request: @{triggerOutputs()?['body/Title']}",
+        "assignedTo": "@{variables('varApproverEmail')}",
+        "details": "## Mainframe Intake Request #@{triggerOutputs()?['body/ID']}\n\n**Requestor:** @{triggerOutputs()?['body/RequestorName']} (@{triggerOutputs()?['body/RequestorEmail']})\n\n**Department:** @{triggerOutputs()?['body/Department/Value']}\n\n**Type:** @{triggerOutputs()?['body/RequestType/Value']}\n\n**Priority:** @{triggerOutputs()?['body/Priority/Value']}\n\n**Environment:** @{triggerOutputs()?['body/MainframeEnvironment/Value']}\n\n**Subsystems:** @{triggerOutputs()?['body/SystemsAffected']}\n\n---\n\n**Description:**\n@{triggerOutputs()?['body/Description']}\n\n**Business Justification:**\n@{triggerOutputs()?['body/BusinessJustification']}\n\n**Requested Completion:** @{triggerOutputs()?['body/RequestedCompletionDate']}",
+        "itemLink": "https://<tenant>.sharepoint.com/sites/MainframeOps/Lists/MainframeIntakeRequests/DispForm.aspx?ID=@{triggerOutputs()?['body/ID']}",
+        "itemLinkDescription": "View in SharePoint"
+      }
+    },
+    {
+      "order": 3,
+      "name": "Condition_Approved",
+      "type": "Condition",
+      "expression": "@equals(outputs('Start_Approval')?['body/outcome'], 'Approve')",
+      "ifTrue": [
+        {
+          "name": "Update_Status_Approved",
+          "type": "SharePoint - Update item",
+          "inputs": {
+            "siteAddress": "https://<tenant>.sharepoint.com/sites/MainframeOps",
+            "listName": "Mainframe Intake Requests",
+            "id": "@{triggerOutputs()?['body/ID']}",
+            "body": {
+              "Status": { "Value": "Approved" },
+              "ApproverName": "@{outputs('Start_Approval')?['body/responses'][0]['responder']['displayName']}",
+              "ApprovalDate": "@{utcNow()}"
+            }
+          }
+        },
+        {
+          "name": "Send_Approved_Email",
+          "type": "Office 365 Outlook - Send an email (V2)",
+          "inputs": {
+            "to": "@{triggerOutputs()?['body/RequestorEmail']}",
+            "subject": "Approved: Mainframe Request #@{triggerOutputs()?['body/ID']} - @{triggerOutputs()?['body/Title']}",
+            "body": "<h2>Your mainframe request has been approved</h2><p><strong>Request:</strong> @{triggerOutputs()?['body/Title']}</p><p><strong>Approved by:</strong> @{outputs('Start_Approval')?['body/responses'][0]['responder']['displayName']}</p><p><strong>Comments:</strong> @{outputs('Start_Approval')?['body/responses'][0]['comments']}</p><p>The mainframe team will begin work shortly. You can track progress in the <a href='https://apps.powerapps.com/play/<YOUR_APP_ID>'>Intake Dashboard</a>.</p>",
+            "importance": "Normal"
+          }
+        }
+      ],
+      "ifFalse": [
+        {
+          "name": "Update_Status_Rejected",
+          "type": "SharePoint - Update item",
+          "inputs": {
+            "siteAddress": "https://<tenant>.sharepoint.com/sites/MainframeOps",
+            "listName": "Mainframe Intake Requests",
+            "id": "@{triggerOutputs()?['body/ID']}",
+            "body": {
+              "Status": { "Value": "Rejected" },
+              "Notes": "Rejected by @{outputs('Start_Approval')?['body/responses'][0]['responder']['displayName']}: @{outputs('Start_Approval')?['body/responses'][0]['comments']}"
+            }
+          }
+        },
+        {
+          "name": "Send_Rejected_Email",
+          "type": "Office 365 Outlook - Send an email (V2)",
+          "inputs": {
+            "to": "@{triggerOutputs()?['body/RequestorEmail']}",
+            "subject": "Rejected: Mainframe Request #@{triggerOutputs()?['body/ID']} - @{triggerOutputs()?['body/Title']}",
+            "body": "<h2>Your mainframe request was not approved</h2><p><strong>Request:</strong> @{triggerOutputs()?['body/Title']}</p><p><strong>Rejected by:</strong> @{outputs('Start_Approval')?['body/responses'][0]['responder']['displayName']}</p><p><strong>Reason:</strong> @{outputs('Start_Approval')?['body/responses'][0]['comments']}</p><p>Please update and resubmit if needed via the <a href='https://apps.powerapps.com/play/<YOUR_APP_ID>'>Intake Dashboard</a>.</p>",
+            "importance": "Normal"
+          }
+        }
+      ]
+    }
+  ],
+  "errorHandling": {
+    "type": "ConfigureRunAfter",
+    "runAfterFailure": {
+      "name": "Send_Error_Notification",
+      "type": "Office 365 Outlook - Send an email (V2)",
+      "inputs": {
+        "to": "mainframe-team@contoso.com",
+        "subject": "FLOW ERROR: Mainframe Intake Approval failed for Request #@{triggerOutputs()?['body/ID']}",
+        "body": "The approval flow encountered an error. Please review the flow run history and process this request manually.",
+        "importance": "High"
+      }
+    }
+  }
+}

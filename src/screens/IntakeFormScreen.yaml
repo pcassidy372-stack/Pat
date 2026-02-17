@@ -1,0 +1,523 @@
+# =============================================================================
+# IntakeFormScreen.yaml
+# PowerApps Canvas App Screen — Mainframe Intake Request Form
+# Import this YAML via Power Apps Studio > Insert > Custom > Import component
+# =============================================================================
+
+Screen: IntakeFormScreen
+  Properties:
+    Fill: =RGBA(245, 245, 245, 1)
+    OnVisible: |
+      =Set(varCurrentUser, User());
+       Set(varFormMode, If(IsBlank(varSelectedRequest), "New", "Edit"));
+       If(
+         varFormMode = "New",
+         Set(varRequestRecord, Defaults('Mainframe Intake Requests')),
+         Set(varRequestRecord, varSelectedRequest)
+       )
+
+  Children:
+
+    # ── Header Bar ──────────────────────────────────────────────────────
+    - HeaderContainer:
+        Control: GroupContainer
+        Properties:
+          X: 0
+          Y: 0
+          Width: =Parent.Width
+          Height: 70
+          Fill: =RGBA(0, 51, 102, 1)
+          LayoutMode: Horizontal
+        Children:
+          - lblScreenTitle:
+              Control: Label
+              Properties:
+                Text: |
+                  =If(varFormMode = "New",
+                    "New Mainframe Intake Request",
+                    "Edit Request: " & varRequestRecord.Title
+                  )
+                Color: =Color.White
+                Font: =Font.'Segoe UI'
+                FontSize: 22
+                FontWeight: =FontWeight.Bold
+                X: 20
+                Y: 15
+                Width: 600
+                Height: 40
+
+          - btnBackToDashboard:
+              Control: Button
+              Properties:
+                Text: "← Dashboard"
+                X: =Parent.Width - 180
+                Y: 15
+                Width: 160
+                Height: 40
+                Fill: =RGBA(255, 255, 255, 0.15)
+                Color: =Color.White
+                BorderColor: =Color.White
+                BorderThickness: 1
+                RadiusTopLeft: 4
+                RadiusTopRight: 4
+                RadiusBottomLeft: 4
+                RadiusBottomRight: 4
+                OnSelect: =Navigate(DashboardScreen, ScreenTransition.Fade)
+
+    # ── Scrollable Form Body ────────────────────────────────────────────
+    - FormScrollContainer:
+        Control: ScrollableScreen  # Vertical container with scroll
+        Properties:
+          X: 0
+          Y: 70
+          Width: =Parent.Width
+          Height: =Parent.Height - 70
+
+        Children:
+          - FormCard:
+              Control: GroupContainer
+              Properties:
+                X: =(Parent.Width - 800) / 2
+                Y: 20
+                Width: 800
+                Height: 1500
+                Fill: =Color.White
+                BorderColor: =RGBA(220, 220, 220, 1)
+                BorderThickness: 1
+                RadiusTopLeft: 8
+                RadiusTopRight: 8
+                RadiusBottomLeft: 8
+                RadiusBottomRight: 8
+                DropShadow: =DropShadow.Light
+
+              Children:
+
+                # ── Section: Requestor Information ──────────────────────
+                - lblSectionRequestor:
+                    Control: Label
+                    Properties:
+                      Text: "Requestor Information"
+                      Font: =Font.'Segoe UI'
+                      FontSize: 16
+                      FontWeight: =FontWeight.Semibold
+                      Color: =RGBA(0, 51, 102, 1)
+                      X: 30
+                      Y: 20
+                      Width: 740
+                      Height: 30
+
+                - lblRequestorName:
+                    Control: Label
+                    Properties:
+                      Text: "Full Name *"
+                      X: 30
+                      Y: 55
+                      Width: 340
+                      Height: 25
+                      FontSize: 12
+                      Color: =RGBA(80, 80, 80, 1)
+
+                - txtRequestorName:
+                    Control: TextInput
+                    Properties:
+                      Default: =varCurrentUser.FullName
+                      X: 30
+                      Y: 80
+                      Width: 340
+                      Height: 40
+                      BorderColor: =RGBA(200, 200, 200, 1)
+                      RadiusTopLeft: 4
+                      RadiusTopRight: 4
+                      RadiusBottomLeft: 4
+                      RadiusBottomRight: 4
+
+                - lblRequestorEmail:
+                    Control: Label
+                    Properties:
+                      Text: "Email *"
+                      X: 420
+                      Y: 55
+                      Width: 340
+                      Height: 25
+                      FontSize: 12
+                      Color: =RGBA(80, 80, 80, 1)
+
+                - txtRequestorEmail:
+                    Control: TextInput
+                    Properties:
+                      Default: =varCurrentUser.Email
+                      X: 420
+                      Y: 80
+                      Width: 340
+                      Height: 40
+                      BorderColor: =RGBA(200, 200, 200, 1)
+                      Format: =TextFormat.Email
+
+                - lblDepartment:
+                    Control: Label
+                    Properties:
+                      Text: "Department *"
+                      X: 30
+                      Y: 130
+                      Width: 340
+                      Height: 25
+                      FontSize: 12
+
+                - ddDepartment:
+                    Control: DropDown
+                    Properties:
+                      Items: |
+                        =["Finance", "Operations", "IT Infrastructure",
+                          "Application Development", "Risk & Compliance",
+                          "HR", "Customer Service", "Other"]
+                      X: 30
+                      Y: 155
+                      Width: 340
+                      Height: 40
+                      BorderColor: =RGBA(200, 200, 200, 1)
+
+                # ── Section: Request Details ────────────────────────────
+                - lblSectionDetails:
+                    Control: Label
+                    Properties:
+                      Text: "Request Details"
+                      Font: =Font.'Segoe UI'
+                      FontSize: 16
+                      FontWeight: =FontWeight.Semibold
+                      Color: =RGBA(0, 51, 102, 1)
+                      X: 30
+                      Y: 220
+                      Width: 740
+                      Height: 30
+
+                - Separator1:
+                    Control: Rectangle
+                    Properties:
+                      X: 30
+                      Y: 250
+                      Width: 740
+                      Height: 1
+                      Fill: =RGBA(220, 220, 220, 1)
+
+                - lblTitle:
+                    Control: Label
+                    Properties:
+                      Text: "Request Title *"
+                      X: 30
+                      Y: 265
+                      Width: 740
+                      Height: 25
+                      FontSize: 12
+
+                - txtTitle:
+                    Control: TextInput
+                    Properties:
+                      Default: =varRequestRecord.Title
+                      HintText: "Brief summary of the mainframe request"
+                      X: 30
+                      Y: 290
+                      Width: 740
+                      Height: 40
+                      MaxLength: 255
+                      BorderColor: =RGBA(200, 200, 200, 1)
+
+                - lblRequestType:
+                    Control: Label
+                    Properties:
+                      Text: "Request Type *"
+                      X: 30
+                      Y: 345
+                      Width: 340
+                      Height: 25
+                      FontSize: 12
+
+                - ddRequestType:
+                    Control: DropDown
+                    Properties:
+                      Items: |
+                        =["New Job Scheduling", "Job Modification",
+                          "Access Request", "Capacity Change",
+                          "Incident / Break-Fix", "Decommission",
+                          "Data Migration", "Performance Tuning",
+                          "Security Review", "Other"]
+                      X: 30
+                      Y: 370
+                      Width: 340
+                      Height: 40
+
+                - lblPriority:
+                    Control: Label
+                    Properties:
+                      Text: "Priority *"
+                      X: 420
+                      Y: 345
+                      Width: 340
+                      Height: 25
+                      FontSize: 12
+
+                - ddPriority:
+                    Control: DropDown
+                    Properties:
+                      Items: =["Critical", "High", "Medium", "Low"]
+                      X: 420
+                      Y: 370
+                      Width: 340
+                      Height: 40
+
+                - lblEnvironment:
+                    Control: Label
+                    Properties:
+                      Text: "Target Environment *"
+                      X: 30
+                      Y: 425
+                      Width: 340
+                      Height: 25
+                      FontSize: 12
+
+                - ddEnvironment:
+                    Control: DropDown
+                    Properties:
+                      Items: |
+                        =["Production", "Pre-Production", "QA",
+                          "Development", "Disaster Recovery"]
+                      X: 30
+                      Y: 450
+                      Width: 340
+                      Height: 40
+
+                - lblSystemsAffected:
+                    Control: Label
+                    Properties:
+                      Text: "Mainframe Subsystems Affected"
+                      X: 420
+                      Y: 425
+                      Width: 340
+                      Height: 25
+                      FontSize: 12
+
+                - cblSubsystems:
+                    Control: ComboBox
+                    Properties:
+                      Items: |
+                        =["CICS", "DB2", "IMS", "MQ Series", "JES2",
+                          "JES3", "TSO/ISPF", "VTAM", "RACF",
+                          "z/OS UNIX", "Batch (JCL)", "VSAM", "Other"]
+                      SelectMultiple: true
+                      X: 420
+                      Y: 450
+                      Width: 340
+                      Height: 40
+
+                - lblDescription:
+                    Control: Label
+                    Properties:
+                      Text: "Detailed Description *"
+                      X: 30
+                      Y: 510
+                      Width: 740
+                      Height: 25
+                      FontSize: 12
+
+                - txtDescription:
+                    Control: TextInput
+                    Properties:
+                      Default: =varRequestRecord.Description
+                      Mode: =TextMode.MultiLine
+                      HintText: |
+                        "Describe the work needed. Include job names,
+                         dataset names, CICS regions, DB2 subsystems,
+                         or any relevant mainframe details."
+                      X: 30
+                      Y: 535
+                      Width: 740
+                      Height: 140
+                      MaxLength: 4000
+                      BorderColor: =RGBA(200, 200, 200, 1)
+
+                - lblJustification:
+                    Control: Label
+                    Properties:
+                      Text: "Business Justification *"
+                      X: 30
+                      Y: 690
+                      Width: 740
+                      Height: 25
+                      FontSize: 12
+
+                - txtJustification:
+                    Control: TextInput
+                    Properties:
+                      Default: =varRequestRecord.BusinessJustification
+                      Mode: =TextMode.MultiLine
+                      HintText: "Why is this work needed? What is the business impact?"
+                      X: 30
+                      Y: 715
+                      Width: 740
+                      Height: 100
+                      MaxLength: 2000
+
+                - lblTargetDate:
+                    Control: Label
+                    Properties:
+                      Text: "Requested Completion Date"
+                      X: 30
+                      Y: 830
+                      Width: 340
+                      Height: 25
+                      FontSize: 12
+
+                - dpTargetDate:
+                    Control: DatePicker
+                    Properties:
+                      DefaultDate: =Today() + 14
+                      X: 30
+                      Y: 855
+                      Width: 340
+                      Height: 40
+
+                # ── Section: Attachments ────────────────────────────────
+                - lblSectionAttach:
+                    Control: Label
+                    Properties:
+                      Text: "Attachments (JCL, logs, screenshots)"
+                      Font: =Font.'Segoe UI'
+                      FontSize: 16
+                      FontWeight: =FontWeight.Semibold
+                      Color: =RGBA(0, 51, 102, 1)
+                      X: 30
+                      Y: 920
+                      Width: 740
+                      Height: 30
+
+                - attUpload:
+                    Control: Attachments
+                    Properties:
+                      Items: =varRequestRecord.Attachments
+                      X: 30
+                      Y: 955
+                      Width: 740
+                      Height: 120
+                      BorderColor: =RGBA(200, 200, 200, 1)
+                      MaxAttachments: 10
+                      MaxAttachmentSize: 10485760
+
+                # ── Validation Message ──────────────────────────────────
+                - lblValidation:
+                    Control: Label
+                    Properties:
+                      Text: =varValidationMessage
+                      Color: =Color.Red
+                      FontSize: 12
+                      X: 30
+                      Y: 1090
+                      Width: 740
+                      Height: 30
+                      Visible: =!IsBlank(varValidationMessage)
+
+                # ── Action Buttons ──────────────────────────────────────
+                - btnSaveDraft:
+                    Control: Button
+                    Properties:
+                      Text: "Save Draft"
+                      X: 30
+                      Y: 1130
+                      Width: 200
+                      Height: 45
+                      Fill: =RGBA(108, 117, 125, 1)
+                      Color: =Color.White
+                      RadiusTopLeft: 4
+                      RadiusTopRight: 4
+                      RadiusBottomLeft: 4
+                      RadiusBottomRight: 4
+                      OnSelect: |
+                        =If(
+                          IsBlank(txtTitle.Text),
+                          Set(varValidationMessage, "Title is required."),
+
+                          // Patch as Draft
+                          Patch(
+                            'Mainframe Intake Requests',
+                            If(varFormMode = "New", Defaults('Mainframe Intake Requests'), varRequestRecord),
+                            {
+                              Title:                   txtTitle.Text,
+                              RequestorName:           txtRequestorName.Text,
+                              RequestorEmail:          txtRequestorEmail.Text,
+                              Department:              ddDepartment.Selected.Value,
+                              RequestType:             ddRequestType.Selected.Value,
+                              Priority:                ddPriority.Selected.Value,
+                              MainframeEnvironment:    ddEnvironment.Selected.Value,
+                              SystemsAffected:         Concat(cblSubsystems.SelectedItems, Value, ", "),
+                              Description:             txtDescription.Text,
+                              BusinessJustification:   txtJustification.Text,
+                              RequestedCompletionDate: dpTargetDate.SelectedDate,
+                              Status:                  "Draft"
+                            }
+                          );
+                          Notify("Draft saved successfully.", NotificationType.Success);
+                          Navigate(DashboardScreen, ScreenTransition.Fade)
+                        )
+
+                - btnSubmit:
+                    Control: Button
+                    Properties:
+                      Text: "Submit Request"
+                      X: 260
+                      Y: 1130
+                      Width: 200
+                      Height: 45
+                      Fill: =RGBA(0, 120, 60, 1)
+                      Color: =Color.White
+                      RadiusTopLeft: 4
+                      RadiusTopRight: 4
+                      RadiusBottomLeft: 4
+                      RadiusBottomRight: 4
+                      OnSelect: |
+                        =// Validate required fields
+                        If(
+                          IsBlank(txtTitle.Text) ||
+                          IsBlank(txtDescription.Text) ||
+                          IsBlank(txtJustification.Text),
+                          Set(varValidationMessage,
+                            "Please fill in all required fields (Title, Description, Justification)."),
+
+                          // All valid — patch and submit
+                          Set(varValidationMessage, "");
+                          Patch(
+                            'Mainframe Intake Requests',
+                            If(varFormMode = "New", Defaults('Mainframe Intake Requests'), varRequestRecord),
+                            {
+                              Title:                   txtTitle.Text,
+                              RequestorName:           txtRequestorName.Text,
+                              RequestorEmail:          txtRequestorEmail.Text,
+                              Department:              ddDepartment.Selected.Value,
+                              RequestType:             ddRequestType.Selected.Value,
+                              Priority:                ddPriority.Selected.Value,
+                              MainframeEnvironment:    ddEnvironment.Selected.Value,
+                              SystemsAffected:         Concat(cblSubsystems.SelectedItems, Value, ", "),
+                              Description:             txtDescription.Text,
+                              BusinessJustification:   txtJustification.Text,
+                              RequestedCompletionDate: dpTargetDate.SelectedDate,
+                              Status:                  "Submitted"
+                            }
+                          );
+                          Notify("Request submitted for review.", NotificationType.Success);
+                          Navigate(DashboardScreen, ScreenTransition.Fade)
+                        )
+
+                - btnCancel:
+                    Control: Button
+                    Properties:
+                      Text: "Cancel"
+                      X: 570
+                      Y: 1130
+                      Width: 200
+                      Height: 45
+                      Fill: =Color.White
+                      Color: =RGBA(108, 117, 125, 1)
+                      BorderColor: =RGBA(108, 117, 125, 1)
+                      BorderThickness: 1
+                      RadiusTopLeft: 4
+                      RadiusTopRight: 4
+                      RadiusBottomLeft: 4
+                      RadiusBottomRight: 4
+                      OnSelect: =Navigate(DashboardScreen, ScreenTransition.Fade)

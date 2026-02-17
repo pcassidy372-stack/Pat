@@ -1,0 +1,63 @@
+{
+  "Departments": [
+    "Finance",
+    "Operations",
+    "IT Infrastructure",
+    "Application Development",
+    "Risk & Compliance",
+    "HR",
+    "Customer Service",
+    "Other"
+  ],
+  "RequestTypes": [
+    "New Job Scheduling",
+    "Job Modification",
+    "Access Request",
+    "Capacity Change",
+    "Incident / Break-Fix",
+    "Decommission",
+    "Data Migration",
+    "Performance Tuning",
+    "Security Review",
+    "Other"
+  ],
+  "Priorities": [
+    "Critical",
+    "High",
+    "Medium",
+    "Low"
+  ],
+  "Environments": [
+    "Production",
+    "Pre-Production",
+    "QA",
+    "Development",
+    "Disaster Recovery"
+  ],
+  "Statuses": [
+    "Draft",
+    "Submitted",
+    "Under Review",
+    "Approved",
+    "In Progress",
+    "On Hold",
+    "Completed",
+    "Rejected",
+    "Cancelled"
+  ],
+  "MainframeSubsystems": [
+    "CICS",
+    "DB2",
+    "IMS",
+    "MQ Series",
+    "JES2",
+    "JES3",
+    "TSO/ISPF",
+    "VTAM",
+    "RACF",
+    "z/OS UNIX",
+    "Batch (JCL)",
+    "VSAM",
+    "Other"
+  ]
+}
