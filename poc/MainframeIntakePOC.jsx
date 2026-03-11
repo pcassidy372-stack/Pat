@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+const { useState, useEffect } = React;
 
 const RECIPIENT_EMAIL = "Patrick.Cassidy@fiserv.com";
 const DUE_WARNING_DAYS = 3;
